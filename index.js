@@ -54,10 +54,12 @@ server.get("/api/users", (req, res) => {
 server.get("/api/users/:id", (req, res) => {
   try {
     let userFound = users.filter((user) => user.id === req.params.id);
-    if (!userFound.name)
+    if (userFound.length === 0) {
       res
         .status(404)
         .json({ message: "The user with the specified ID does not exist." });
+      return;
+    }
     res.send(userFound);
   } catch (err) {
     res
@@ -95,17 +97,20 @@ server.put("/api/users/:id", (req, res) => {
     users = users.map((user) => {
       if (user.id === req.params.id) {
         userFound = true;
+        console.log("User found!");
         user = req.body;
         user.id = nanoid();
         return user;
       }
       return user;
     });
-    if (!userFound)
+    if (!userFound) {
       res
         .status(404)
         .json({ message: "The user with the specified ID does not exist." });
-    res.status(200).json(users);
+    } else {
+      res.status(200).json(users);
+    }
   } catch (err) {
     res
       .status(500)
